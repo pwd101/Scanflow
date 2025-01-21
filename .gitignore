@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 # python
-pycache/*
+__pycache__/*

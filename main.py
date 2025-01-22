@@ -4,21 +4,50 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pathlib import Path
 from pydantic import BaseModel
+import os 
 
 # Get react app build folder
-REACT_APP_BUILD_PATH = "client/dist"
-
+REACT_APP_BUILD_PATH = os.path.join("client", "dist")
 
 app = FastAPI()
 
-# # Enable CORS
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["*"],  # Allow all origins. For production, configure this properly
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
+# Enable CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# app.mount("/", StaticFiles(directory=REACT_APP_BUILD_PATH, html=True), name="static")
+
+@app.get("/test")
+async def mano():
+    return "mano"
+
+# Make it return the index.html on non `/static` requests
+@app.get("/{path:path}")
+async def catch_all(path: str):
+    # Return the index.html file for all other paths
+    # This will handle all the react router routes
+    return FileResponse(os.path.join("client", "dist", "index.html"))
+
+
+
+if __name__ == "__main__":
+    # For local development
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8080)
+
+
+# gcloud run deploy scanner --region us-central1 --allow-unauthenticated
+"""
+gcloud run deploy scanflow1 --region=europe-west9 --min-instances=1 --concurrency=20 --memory=256Mi --allow-unauthenticated --timeout=60 --source .
+gcloud run deploy scanflow1 --region=europe-west9 --min-instances=1 --concurrency=20 --memory=256Mi --allow-unauthenticated --timeout=60 --source .
+"""
+
+
 
 # # Define data model for submit route request
 # class SubmitData(BaseModel):
@@ -31,8 +60,12 @@ app = FastAPI()
 #     print("Received data:", data)
 #     return {"message": "Data received successfully!"}
 
-# # Serve React App (Adjusted to use pathlib)
-# app.mount("/", StaticFiles(directory=REACT_APP_BUILD_PATH, html=True), name="static")
+
+# @app.get("/")
+# async def serve_frontend():
+#     # index_file_path = Path(REACT_APP_BUILD_PATH) / "index.html"
+#     index_file_path = "client/dist/index.html"
+#     return "FileResponse(index_file_path)"
 
 
 # @app.get("/{path:path}")
@@ -46,23 +79,3 @@ app = FastAPI()
 #     index_file_path = Path(REACT_APP_BUILD_PATH) / "index.html"
 #     print("i", index_file_path)
 #     return FileResponse(index_file_path)
-
-@app.get("/")
-async def serve_frontend():
-    return "test"
-
-    # index_file_path = Path(REACT_APP_BUILD_PATH) / "index.html"
-    # print("i", index_file_path)
-    # return FileResponse(index_file_path)
-
-
-# if __name__ == "__main__":
-#     # For local development
-#     import uvicorn
-#     uvicorn.run(app, host="localhost", port=8080)
-
-
-# gcloud run deploy scanner --region us-central1 --allow-unauthenticated
-"""
-gcloud run deploy scanflow1 --region=europe-west9 --min-instances=1 --concurrency=20 --memory=258Mi --allow-unauthenticated --timeout=60 --source .
-"""

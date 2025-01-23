@@ -12,6 +12,8 @@ RUN pip install -r requirements.txt
 
 # Copy the entire application code into the container
 
+RUN ls -la
+
 # Expose port 8080 for the Flask app
 EXPOSE 8080
 

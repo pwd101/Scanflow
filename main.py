@@ -20,7 +20,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# app.mount("/", StaticFiles(directory=REACT_APP_BUILD_PATH, html=True), name="static")
+app.mount("/", StaticFiles(directory=REACT_APP_BUILD_PATH, html=True), name="assets")
 
 @app.get("/test")
 async def mano():
@@ -31,15 +31,12 @@ async def mano():
 async def catch_all(path: str):
     # Return the index.html file for all other paths
     # This will handle all the react router routes
-    return FileResponse(os.path.join("client", "dist", "index.html"))
-
-
+    return FileResponse(os.path.join("app","client", "index.html"))
 
 if __name__ == "__main__":
     # For local development
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8080)
-
 
 # gcloud run deploy scanner --region us-central1 --allow-unauthenticated
 """

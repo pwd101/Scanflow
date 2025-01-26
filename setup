@@ -1,0 +1,3 @@
+gcloud pubsub topics create scanflow-scan-event-topic
+
+gcloud functions deploy NAME --runtime=python312 --region=europe-west9  --trigger-topic=scanflow-scan-event-topic --source=.

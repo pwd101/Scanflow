@@ -1,38 +1,70 @@
 .app-container{
     display: flex;
     flex-direction: column;
-    background-color: rgb(214, 214, 214);
     height: 100vh;
 }
 .app-header{
     background-color: #474747;
     color: white;
-    padding: 1em;
+    padding: 0.5em;
     text-align: center;
-    size: 1em;
+    font-size: 1.5em;
 }
 
 .app-content{
-    flex: 1;
     display: flex;
     justify-content: center; 
     align-items: center;
+    padding: 1em;
+    flex-direction: column;
+    background-color: rgb(75, 75, 75);
+    height: 100%;
 }
+
+
 
 .scanner-container{
     position: relative;
-    background-color: rgb(207, 207, 207);
+    background-color: #f0f0f0; /* Lighter background */
+    border-radius: 12px; /* Slightly more rounded corners */
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    width: 100%; /* Default to full width */
+    max-width: 400px; /* Maximum width for larger screens */
+}
+
+
+/* Media query for larger screens (tablets and desktops) */
+@media (min-width: 768px) { /* Adjust breakpoint as needed */
+    .scanner-container {
+        width: 100%; /* Reset width */
+    }
 }
 
 .scanner-frame-container{
-    /* square */
     position: relative;
     aspect-ratio: 1 / 1;
     width: 100%;
     max-height: calc(100vh - 4em);
     overflow: hidden;
-    background-color: aqua;
+    background-color: #222;
 }
+
+.scanner-frame-container-off{
+    position: relative;
+    background-color: #5c5c5c;
+    color: #f0f0f0;
+    /* height: 100%;
+    width: 100%; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    max-height: calc(100vh - 4em);
+}
+
+
 
 .scanner-frame{
     position: relative;
@@ -41,12 +73,144 @@
     object-fit: cover;
 }
 
-.scanner-timer{
+.scanner-timer {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: black;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(0, 0, 0, 0.4);
     color: white;
-    padding: 3px;
-    border-radius: 5px;
+    padding: 5px;
+    border-radius: 8px;
+    font-size: 0.8em; 
+    font-family: sans-serif;
+}
+
+.tap-btn{
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    padding: 1.5em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 1.1rem;
+}
+
+
+
+/* MODAL */
+
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6); /* Dim the background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Ensure modal is on top */
+}
+
+/* Modal Container */
+.modal-container {
+    position: relative;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 300px;
+    margin: 1em;
+    animation: fadeIn 0.2s ease-out; /* Fade-in animation */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+/* Modal Header */
+.modal-header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    width: 100%;
+}
+
+.modal-title {
+    margin: 0;
+    font-size: 1.3rem;
+    color: #333;
+    width: 100%;
+}
+
+/* Modal Body */
+.modal-body {
+    margin-bottom: 1em;
+    width: 100%;
+
+}
+
+.data-list {
+    list-style: none;
+    padding: 0;
+}
+
+.data-item {
+    margin-bottom: 10px;
+}
+
+.data-item-key{
+    font-weight: 600;
+}
+
+.data-item-select{
+    display: flex; /* Use flexbox to make them inline */
+    align-items: center; /* Vertically align content */
+    flex: 1;
+    width: 100%;
+}
+
+.place-select-container{
+    width: 100%;
+    padding-left: 10px;
+    padding-right: 20px;
+}
+
+/* Buttons */
+.modal-button-send {
+    display: flex;
+    justify-content: center;
+    padding: 20px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    max-width: 200px;
+    background-color: #5cb88a;
+    color: white;
+    width: 100%;
+}
+
+.modal-button-send:hover {
+    opacity: 0.8;
+}
+
+/* Close Button */
+.modal-close-button {
+    position: absolute;
+    right: 7px;
+    top: 0px;
+    background: none;
+    border: none;
+	cursor: pointer;
+    font-size: 2rem;
+    color: #666;
+    padding: 0;
+	display: flex;
+	align-items: center;
+    transition: color 0.3s ease;
 }

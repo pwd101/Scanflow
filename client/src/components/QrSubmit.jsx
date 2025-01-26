@@ -1,104 +1,103 @@
 import React, { useState } from 'react';
+import Select from 'react-select'
+import axios from 'axios';
 
-const QrSubmit = ({ qrText, onClose, onSend }) => {
+
+const QrSubmit = ({qrText, placeOptions, defaultPlace, onClose, onPlaceChange }) => {
     const [parsedData, setParsedData] = useState(null);
     const [showModal, setShowModal] = useState(true);
 
     // Parse the QR code text
     const parseQrData = (text) => {
-        if (!text) {
-          return null;
-        }
+        if (!text) { return null;}
         const parts = text.split(';');
-        if (parts.length !== 4) {
+        if (parts.length <  4) {
             return { error: "Invalid QR code format" };
         }
-        const [name, surname, company, email] = parts;
-        return { name, surname, company, email };
+        const [surname, name, email, company] = parts.slice(0, 4).map(str => {
+            if(typeof str !== 'string') return str;
+            return str.replace(/"/g, '').trim();
+          });
+
+        const data = { surname, name, email, company }
+        data["qr_text"] = qrText
+        data["scan_time"] = new Date().toISOString()
+        return data
+        
     };
+
     //close the modal
     const closeModal = () => {
-      setShowModal(false);
+        setShowModal(false);
         if (onClose) onClose();
     }
 
-
-    // Handle the send logic
-    const sendData = async () => {
-      try{
-          const response = await fetch('/api/submit', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(parsedData),
-          });
-        if (response.ok) {
-            console.log("Data sent");
-            closeModal();
-        } else {
-            console.error("Failed to submit:", response.statusText);
-           // Handle errors, you may show an alert or an error message
-        }
-      } catch(error) {
-        console.error("Error:", error)
-        // Handle network error or api error
-      }
-
-    if(onSend) onSend(parsedData);
-    };
+	// Handle the send logic
+	const sendData = async () => {
+		try{
+            console.log("Post data:", parsedData);
+			const response = await axios.post('/api/submit', parsedData)
+            
+			if (response.status == 200) {
+                // console.log("Data successfuly sent")
+				closeModal();
+			} else {
+				console.error("Failed to submit:", response.statusText);
+			}
+		} catch(error) {
+			console.error("Error:", error)
+		}
+	};
 
     useState(()=> {
         const data = parseQrData(qrText);
         setParsedData(data)
     }, [qrText]);
 
-   // Simplified Modal Style
-    const modalStyle = {
-      position: 'fixed',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      backgroundColor: 'white',
-      padding: '20px',
-      border: '1px solid #ccc',
-      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-      zIndex: 1000,
-    };
+    const handlePlaceChange = (place) => {
+        onPlaceChange(place)
+    }
+   
+	
+	if(!showModal) return null
+	    return (
+        <div className="modal-overlay">
+            <div className="modal-container">
+                <div className="modal-header">
+                    <div className="modal-title">Résultats</div>
+					<button className="modal-close-button" onClick={closeModal}>×</button>
+                </div>
 
-    const overlayStyle = {
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-       zIndex: 999
-    };
-
-  if(!showModal) return null
-  return (
-     <>
-      <div style={overlayStyle} onClick={closeModal}></div>
-        <div style={modalStyle}>
-            {parsedData && parsedData.error ? (
-              <p>{parsedData.error}</p>
-            ) : parsedData ? (
-                <div>
-                    <p>Name: {parsedData.name}</p>
-                    <p>Surname: {parsedData.surname}</p>
-                    <p>Company: {parsedData.company}</p>
-                    <p>Email: {parsedData.email}</p>
-                    <button onClick={sendData}>Send</button>
-                  </div>
-            ) : (
-               <p>No data to show</p>
-            )}
-            <button onClick={closeModal}>Cancel</button>
-
+                <div className="modal-body">
+                    {parsedData && parsedData.error ? (
+                        <p>{parsedData.error}</p>
+                    ) : parsedData ? (
+                        <ul className="data-list">
+                            <li className="data-item"><span className='data-item-key'>Name:</span> {parsedData.name}</li>
+                            <li className="data-item"><span className='data-item-key'>Surname:</span> {parsedData.surname}</li>
+                            <li className="data-item"><span className='data-item-key'>Company:</span> {parsedData.company}</li>
+                            <li className="data-item"><span className='data-item-key'>Email:</span> {parsedData.email}</li>
+                            <li className="data-item"><span className='data-item-key'>Scan time:</span> {parsedData.scan_time.slice(0,-5).replace("T", " ")}</li>
+							<li className="data-item data-item-select">
+                                <span className='data-item-key'>Place:</span>
+                                <div className='place-select-container'>
+							        <Select 
+                                        menuPlacement='auto' 
+                                        options={placeOptions} 
+                                        defaultValue={defaultPlace}
+                                        onChange={handlePlaceChange}
+                                    />
+                                </div>
+                            </li>
+                        </ul>
+                    ) : (
+						<p>Loading...</p>
+					)}
+                </div>
+				<button className="modal-button-send" onClick={sendData}>Send</button>
+            </div>
         </div>
-    </>
-  );
+    );
 };
 
 export default QrSubmit;

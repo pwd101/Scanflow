@@ -1,3 +1,8 @@
-uvicorn
-fastapi
-pydantic
+flask
+flask_cors
+waitress
+google-cloud-firestore
+google-cloud-pubsub
+
+# fastapi
+# pydantic

@@ -1,78 +1,45 @@
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-from pathlib import Path
-from pydantic import BaseModel
-import os 
+from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
+import os
+from pubsub import publish_message
+from google.cloud import firestore
 
-# Get react app build folder
-REACT_APP_BUILD_PATH = os.path.join("client", "dist")
+PROJECT_ID = "qr-code-decideomtour-scanflow" 
+TOPIC_ID = "qr-code-scan"
 
-app = FastAPI()
+# message_dict = {"name": "John Doe", "age": 30}
+# publish_message(PROJECT_ID, TOPIC_ID, message_dict)
 
-# Enable CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"], 
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+firestore_db = firestore.Client(project=PROJECT_ID)
+docref = doc_ref = firestore_db.collection("test_coll").document("test_doc")
+doc_ref_infos = doc_ref.get().to_dict()
+print(doc_ref.get().to_dict())
 
-app.mount("/", StaticFiles(directory=REACT_APP_BUILD_PATH, html=True), name="assets")
+# REACT_APP_BUILD_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'client', 'dist'))
 
-@app.get("/test")
-async def mano():
-    return "mano"
+# print("REACT_APP_BUILD_PATH:", REACT_APP_BUILD_PATH)
 
-# Make it return the index.html on non `/static` requests
-@app.get("/{path:path}")
-async def catch_all(path: str):
-    # Return the index.html file for all other paths
-    # This will handle all the react router routes
-    return FileResponse(os.path.join("app","client", "index.html"))
+# app = Flask(__name__, static_folder='client/dist')
+# CORS(app) 
 
-if __name__ == "__main__":
-    # For local development
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8080)
-
-# gcloud run deploy scanner --region us-central1 --allow-unauthenticated
-"""
-gcloud run deploy scanflow1 --region=europe-west9 --min-instances=1 --concurrency=20 --memory=256Mi --allow-unauthenticated --timeout=60 --source .
-gcloud run deploy scanflow1 --region=europe-west9 --min-instances=1 --concurrency=20 --memory=256Mi --allow-unauthenticated --timeout=60 --source .
-"""
+# @app.route('/api/submit', methods=['POST'])
+# def submit_data():
+#     data = request.get_json()
+#     print('Received data:', data)
+#     return jsonify({'message': 'Data received successfully!'})
 
 
-
-# # Define data model for submit route request
-# class SubmitData(BaseModel):
-#     key1: str
-#     key2: int
-#     # Other required/optional fields
-
-# @app.post("/api/submit")
-# async def submit_data(data: SubmitData):
-#     print("Received data:", data)
-#     return {"message": "Data received successfully!"}
+# # Serve React App
+# @app.route('/', defaults={'path': ''}, methods=['GET'])
+# @app.route('/<path:path>')
+# def serve(path):
+#     if path != "" and os.path.exists(app.static_folder + '/' + path):
+#         return send_from_directory(app.static_folder, path)
+#     else:
+#         return send_from_directory(app.static_folder, 'index.html')
 
 
-# @app.get("/")
-# async def serve_frontend():
-#     # index_file_path = Path(REACT_APP_BUILD_PATH) / "index.html"
-#     index_file_path = "client/dist/index.html"
-#     return "FileResponse(index_file_path)"
+# if __name__ == '__main__':
+#     # This is only for local testing. Deployment to Cloud Functions uses the `main` function.
+#     app.run(debug=True, host='localhost', port=8080)
 
-
-# @app.get("/{path:path}")
-# async def serve_frontend(path: str):
-#     print("path", path)
-#     return "test"
-#     static_file_path = Path(REACT_APP_BUILD_PATH) / path
-#     if static_file_path.is_file():
-#        return FileResponse(static_file_path)
-
-#     index_file_path = Path(REACT_APP_BUILD_PATH) / "index.html"
-#     print("i", index_file_path)
-#     return FileResponse(index_file_path)

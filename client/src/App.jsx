@@ -4,44 +4,53 @@ import QrScan from './components/QrScan';
 import QrSubmit from './components/QrSubmit';
 
 function App() {
-    const [isCameraOpen, setIsCameraOpen] = useState(true)
-    const [isSubmitting, setIsSubmitting] = useState(true)
-    const [scanResult, setScanResult] = useState("")
+	const [isCameraOpen, setIsCameraOpen] = useState(true)
+	const [isSubmitting, setIsSubmitting] = useState(false)
+	// const [scanResult, setScanResult] = useState('"ALLIAUME"; "Aurore"; "aalliaume@nhood.com"; "Nhood"')
+	const [scanResult, setScanResult] = useState('')
 
-    const handleClick = () =>{
-      setIsCameraOpen(!isCameraOpen);
-    }
+	const [placeOptions, setPlaceOptions] = useState([
+		{ value: 'atelier_1',  label: 'Atelier 1' },
+		{ value: 'atelier_2',  label: 'Atelier 2' },
+		{ value: 'corner_1',   label: 'Corner 1' },
+        { value: 'corner_2',   label: 'Corner 2' },
+	])
+
+
+	const [lastPlace, setLastPlace] = useState(placeOptions[0]);
+
+    const handleClick = () => setIsCameraOpen(!isCameraOpen);
 
     const hookGetResultType = (x) => { 
-      setScanResult(x.scanResult)
+		setScanResult(x.data)
+		setIsSubmitting(true)
     }	
 
+	const hookGetPlaceChange = (x) => setLastPlace(x);
+
     const handleCloseModal = () => {
-      setIsSubmitting(false);
-      setScanResult("");
+		setIsSubmitting(false);
+		setScanResult("");
     }
 
-    const handleSendData = (data) => {
-      console.log("The data to be sent is", data);
-  }
-
-
+	  
   return (
     <div className="app-container">
-      <div className="app-header" onClick={handleClick}>ScanFlow</div>
-
+		<div className="app-header" onClick={handleClick}>ScanFlow</div>
+		
         {scanResult && isSubmitting && (
           <QrSubmit
             qrText={scanResult}
             onClose={handleCloseModal}
-            onSend={handleSendData}
+			placeOptions = {placeOptions}
+			defaultPlace = {lastPlace}
+			onPlaceChange={hookGetPlaceChange}
           />
         )}
 
         <div className="app-content" >
-          {isCameraOpen? <QrScan onScan={hookGetResultType}/> : <></>}
+          	{isCameraOpen? <QrScan onScan={hookGetResultType}/> : <></>}
         </div>
-      {scanResult}
     </div>
   );
 }

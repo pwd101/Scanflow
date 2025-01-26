@@ -1,1 +1,1 @@
-gcloud run deploy scanflow --region=europe-west9 --min-instances=1 --concurrency=20 --memory=256Mi --allow-unauthenticated --timeout=60 --source .
+gcloud run deploy scanflow --region=europe-west9 --min-instances=0 --concurrency=20 --memory=256Mi --allow-unauthenticated --timeout=60 --source .

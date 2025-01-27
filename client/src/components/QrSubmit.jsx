@@ -3,7 +3,7 @@ import Select from 'react-select'
 import axios from 'axios';
 
 
-const QrSubmit = ({qrText, placeOptions, defaultPlace, onClose, onPlaceChange }) => {
+const QrSubmit = ({qrText, placeOptions, currentPlace, onClose, onPlaceChange, onNotification}) => {
     const [parsedData, setParsedData] = useState(null);
     const [showModal, setShowModal] = useState(true);
 
@@ -18,10 +18,13 @@ const QrSubmit = ({qrText, placeOptions, defaultPlace, onClose, onPlaceChange })
             if(typeof str !== 'string') return str;
             return str.replace(/"/g, '').trim();
           });
-
+        
+        
         const data = { surname, name, email, company }
-        data["qr_text"] = qrText
+        // data["qr_text"] = qrText
         data["scan_time"] = new Date().toISOString()
+        data["city"] = currentPlace.city
+        data["location"] = currentPlace.value
         return data
         
     };
@@ -32,17 +35,23 @@ const QrSubmit = ({qrText, placeOptions, defaultPlace, onClose, onPlaceChange })
         if (onClose) onClose();
     }
 
+    const showNotification = (msg)=>{
+        onNotification(msg)
+    }
+
 	// Handle the send logic
 	const sendData = async () => {
 		try{
-            console.log("Post data:", parsedData);
+            // console.log("Post:", parsedData);
 			const response = await axios.post('/api/submit', parsedData)
-            
+            // console.log("resp", response)
 			if (response.status == 200) {
-                // console.log("Data successfuly sent")
+                showNotification("Success ✅")
 				closeModal();
 			} else {
+                showNotification("Failed ❌ ")
 				console.error("Failed to submit:", response.statusText);
+                closeModal();
 			}
 		} catch(error) {
 			console.error("Error:", error)
@@ -60,7 +69,7 @@ const QrSubmit = ({qrText, placeOptions, defaultPlace, onClose, onPlaceChange })
    
 	
 	if(!showModal) return null
-	    return (
+    return (
         <div className="modal-overlay">
             <div className="modal-container">
                 <div className="modal-header">
@@ -78,13 +87,14 @@ const QrSubmit = ({qrText, placeOptions, defaultPlace, onClose, onPlaceChange })
                             <li className="data-item"><span className='data-item-key'>Company:</span> {parsedData.company}</li>
                             <li className="data-item"><span className='data-item-key'>Email:</span> {parsedData.email}</li>
                             <li className="data-item"><span className='data-item-key'>Scan time:</span> {parsedData.scan_time.slice(0,-5).replace("T", " ")}</li>
-							<li className="data-item data-item-select">
-                                <span className='data-item-key'>Place:</span>
+                            <li className="data-item"><span className='data-item-key'>City:</span> {currentPlace.city}</li>
+                            <li className="data-item data-item-select">
+                                <span className='data-item-key'>Location:</span>
                                 <div className='place-select-container'>
 							        <Select 
                                         menuPlacement='auto' 
                                         options={placeOptions} 
-                                        defaultValue={defaultPlace}
+                                        defaultValue={currentPlace}
                                         onChange={handlePlaceChange}
                                     />
                                 </div>

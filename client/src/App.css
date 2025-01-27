@@ -4,11 +4,28 @@
     height: 100vh;
 }
 .app-header{
+    position: relative;
     background-color: #474747;
     color: white;
     padding: 0.5em;
     text-align: center;
     font-size: 1.5em;
+    max-height: 50px;
+}
+
+.header-title-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.header-icon{
+    max-height: 30px;
+}
+
+.header-item{
+    padding: 0 0.3rem;
 }
 
 .app-content{
@@ -164,7 +181,8 @@
 }
 
 .data-item-key{
-    font-weight: 600;
+    font-weight: 550;
+    color: #9c2222;
 }
 
 .data-item-select{
@@ -214,3 +232,28 @@
 	align-items: center;
     transition: color 0.3s ease;
 }
+
+
+
+/* Notification */
+
+.notification {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    background-color: rgb(240, 240, 240); /* Example background color */
+    color: rgb(27, 27, 27);
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    z-index: 1001; 
+    white-space: nowrap;
+  }
+  
+  .notification.show {
+      opacity: 1; /* Make visible */
+      transform: translateY(0);
+  }
